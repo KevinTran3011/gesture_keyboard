@@ -50,9 +50,9 @@ class Application(tk.Frame):
         # generate the function button
 
         
-        keyboard_bottom_y = window_height - 250  # Adjust this value as needed
-        self.microphone_button = tk.Button(master, text="Microphone", command=self.open_microphone_window)
-        self.microphone_button.place(x=10, y=keyboard_bottom_y, width=80, height=30)
+        keyboard_bottom_y = window_height - 280  # Adjust this value as needed
+        self.microphone_button = tk.Button(master, text="Function", command=self.open_microphone_window)
+        self.microphone_button.place(x=0, y=keyboard_bottom_y, width=80, height=30)
         # generate a recognizer
         self.word_recognizer = recognizer.Recognizer(templates.set_templates())
         self.gesture_points = []
@@ -151,7 +151,6 @@ class Application(tk.Frame):
 
     def execute_function(self, function, message):
         # Add the code to execute the function here, e.g., cut, copy, or save.
-        # For now, just display a message.
         print(message)
         messagebox.showinfo("Function Executed", message)
 
