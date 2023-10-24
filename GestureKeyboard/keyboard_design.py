@@ -1,3 +1,5 @@
+from tkinter import Tk, Canvas, Toplevel, Label
+
 class Key:
     def __init__(self, key_name, key_width, key_height, key_top_left_x, key_top_left_y):
         self.key_name = key_name
@@ -25,6 +27,62 @@ class Keyboard:
         # Creating an empty list
         self.keys = []
         self.key_pressed = 0
+        self.draw_pad_window = None
+        
+    def create_button(self):
+        button_width = 50
+        button_height = 50
+        button_x = self.keyboard_width - button_width - 10
+        button_y = self.keyboard_height - button_height - 10
+
+        button = self.canvas.create_rectangle(button_x, button_y, button_x + button_width, button_y + button_height, fill='blue')
+        self.canvas.tag_bind(button, "<Button-1>", self.create_draw_pad)
+    
+    def create_draw_pad(self, event):
+        if not self.draw_pad_window:
+            self.draw_pad_window = Toplevel()
+            self.draw_pad_window.title("Draw Pad")
+            draw_pad_canvas = Canvas(self.draw_pad_window, width=400, height=400, bg="white")
+            draw_pad_canvas.pack()
+            # Bind mouse events to the draw pad
+            draw_pad_canvas.bind("<Button-1>", self.start_drawing)
+            draw_pad_canvas.bind("<B1-Motion>", self.draw)
+            draw_pad_canvas.bind("<ButtonRelease-1>", self.stop_drawing)
+
+    def start_drawing(self, event):
+        # Handle draw pad drawing start event here
+        pass
+
+    def draw(self, event):
+        # Handle drawing event here
+        pass
+
+    def stop_drawing(self, event):
+        # Handle drawing stop event here
+        pass
+
+    def handle_key_event(self, key_name):
+        if self.draw_pad_window:
+            if key_name == "C":
+                self.copy_function()
+            elif key_name == "S":
+                self.save_function()
+
+    def copy_function(self):
+        # Function to copy the drawing
+        popup = Tk()
+        popup.title("Copy Function")
+        label = Label(popup, text="Function copy is executed.")
+        label.pack()
+        popup.mainloop()
+
+    def save_function(self):
+        # Function to save the drawing
+        popup = Tk()
+        popup.title("Save Function")
+        label = Label(popup, text="Function save is executed.")
+        label.pack()
+        popup.mainloop()
 
     def get_keys(self):
         return self.keys

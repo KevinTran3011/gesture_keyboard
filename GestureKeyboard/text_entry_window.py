@@ -9,6 +9,7 @@ class Application(tk.Frame):
     def __init__(self, window_width, window_height, master=None):
         super().__init__(master)  # Call tk.Frame.__init__(master)
         self.master = master  # Update the master object after tk.Frame() makes necessary changes to it
+
         frame_bottom_height = 200
         frame_middle_height = 50
         frame_top_height = window_height - frame_bottom_height - frame_middle_height
@@ -53,6 +54,13 @@ class Application(tk.Frame):
         keyboard_bottom_y = window_height - 280  # Adjust this value as needed
         self.microphone_button = tk.Button(master, text="Function", command=self.open_microphone_window)
         self.microphone_button.place(x=0, y=keyboard_bottom_y, width=80, height=30)
+
+
+        # generate a canvas drawing button
+
+        self.drawing_button = tk.Button(master, text="Open Drawing Window", command=self.open_draw_window)
+        self.drawing_button.place(x=100, y=keyboard_bottom_y, width=200, height=30)
+
         # generate a recognizer
         self.word_recognizer = recognizer.Recognizer(templates.set_templates())
         self.gesture_points = []
@@ -77,7 +85,64 @@ class Application(tk.Frame):
         for i in range(len(self.label_word_candidates)): # clear the content of all word labels
             self.label_word_candidates[i].config(text='')
 
-    # press mouse left button
+    def open_draw_window(self):
+        # Function to open the drawing window
+        draw_window = tk.Toplevel(self.master)
+        draw_window.title("Drawing Window")
+        draw_pad_canvas = tk.Canvas(draw_window, width=400, height=400, bg="white")
+        draw_pad_canvas.pack()
+
+        def start_drawing(event):
+            nonlocal last_x, last_y
+            last_x, last_y = event.x, event.y
+
+        def draw(event):
+            nonlocal last_x, last_y
+            x, y = event.x, event.y
+            if last_x is not None:
+                draw_pad_canvas.create_line(last_x, last_y, x, y, fill="black", width=2)
+            last_x, last_y = x, y
+
+        def stop_drawing(event):
+            nonlocal last_x, last_y
+            last_x, last_y = None, None
+
+        last_x, last_y = None, None
+        draw_pad_canvas.bind("<Button-1>", start_drawing)
+        draw_pad_canvas.bind("<B1-Motion>", draw)
+        draw_pad_canvas.bind("<ButtonRelease-1>", stop_drawing)
+
+    # pattern recognition code
+    def recognize_pattern(self):
+    # Implement your pattern recognition logic here
+    # Recognize an "S" pattern
+
+        if len(self.gesture_points) >= 5:
+            x_values = [point.x for point in self.gesture_points]
+            y_values = [point.y for point in self.gesture_points]
+
+            x_range = max(x_values) - min(x_values)
+            y_range = max(y_values) - min(y_values)
+
+            # Check if the pattern somewhat resembles an "S"
+            if x_range > 0 and y_range > 0:
+                x_center = (max(x_values) + min(x_values)) / 2
+                y_center = (max(y_values) + min(y_values)) / 2
+
+                is_s = True
+                for x, y in zip(x_values, y_values):
+                    if (y > y_center) and (x < x_center):
+                        is_s = False
+                        break
+
+                if is_s:
+                    return "Text saved"
+
+        return "Unrecognized"
+
+
+
+        # press mouse left button
     def mouse_left_button_press(self, event):
         self.cursor_move_position_list.append([event.x, event.y, 0])  # store x, y, segment tag
         self.keyboard.key_press(event.x, event.y)
@@ -159,7 +224,7 @@ if __name__ == '__main__':
     master = tk.Tk()
     window_width = 500
     window_height = 600
-    master.geometry(str(window_width) + 'x' + str(window_height))  # master.geometry('500x600')
-    master.resizable(0, 0)  # can not change the size of the window
+    master.geometry(str(window_width) + 'x' + str(window_height))
+    master.resizable(0, 0)
     app = Application(window_width, window_height, master=master)
-    app.mainloop()  # mainloop() tells Python to run the Tkinter event loop. This method listens for events, such as button clicks or keypresses, and blocks any code that comes after it from running until the window it's called on is closed.
+    app.mainloop()
